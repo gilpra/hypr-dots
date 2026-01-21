@@ -39,3 +39,17 @@ install_packages \
     "$PKG_FILE" \
     'sudo pacman -S --needed --noconfirm' \
     'pacman -Q'
+
+# Enable Fish shell
+if command -v fish >/dev/null 2>&1; then
+    current_shell=$(basename "$SHELL")
+    if [[ "$current_shell" != "fish" ]]; then
+        log "Setting fish as default shell..."
+        if chsh -s "$(command -v fish)"; then
+            ok "Fish shell activated"
+        else
+            warn "Failed to change shell, run 'chsh -s $(command -v fish)' manually."
+        fi
+    fi
+fi
+
