@@ -59,3 +59,9 @@ if ! command -v stow >/dev/null 2>&1; then
     sudo pacman -S --needed --noconfirm stow
     ok "stow installed"
 fi
+
+log "Creating symlinks using stow..."
+cd "$DOTFILES_DIR"
+stow --target="$HOME" dots-hypr
+
+ok "Setup completed"
