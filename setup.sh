@@ -53,3 +53,9 @@ if command -v fish >/dev/null 2>&1; then
     fi
 fi
 
+# Ensure stow installed
+if ! command -v stow >/dev/null 2>&1; then
+    log "stow not found, installing..."
+    sudo pacman -S --needed --noconfirm stow
+    ok "stow installed"
+fi
