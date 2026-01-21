@@ -10,3 +10,4 @@ xdg-desktop-portal
 xdg-desktop-portal-hyprland
 xdg-user-dirs
 hyprpaper
+alacritty
