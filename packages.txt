@@ -13,3 +13,4 @@ hyprpaper
 alacritty
 fish
 eza
+fastfetch
