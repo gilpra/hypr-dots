@@ -16,3 +16,4 @@ eza
 fastfetch
 zoxide
 starship
+rofi-wayland
