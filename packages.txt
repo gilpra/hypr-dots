@@ -17,3 +17,4 @@ fastfetch
 zoxide
 starship
 rofi-wayland
+grim

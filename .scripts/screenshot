@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Directory penyimpan Screenshots
+DIR="$HOME/Pictures/Screenshots"
+
+# Cek jika belum ada folder Screenshots
+if [ ! -d $DIR ]; then
+    mkdir -p $DIR
+fi
+
+# Nama file screenshot berdasarkan timestamp
+FILENAME="$(date +'%Y-%m-%d_%H%M%S.png')"
+FULLPATH="$DIR/$FILENAME"
+
+# Ambil Screenshots
+grim "$FULLPATH"
+
+# Cek jika grim berhasil lalu beri notifikasi
+if [ $? -eq 0 ]; then
+    notify-send -i "$FULLPATH" "Screenshot Successful" "Saved in $FULLPATH"
+else
+    notify-send "Screenshots failed" "An error occurred while taking a screenshot"
+fi
+
+
