@@ -1,3 +1,10 @@
+# Jika sesi login dan berada di tty1
+if status is-login
+    if test -z "$DISPLAY" && test (tty) = /dev/tty1
+        exec Hyprland
+    end
+end
+
 ###########
 ## ALIAS ##
 ###########
