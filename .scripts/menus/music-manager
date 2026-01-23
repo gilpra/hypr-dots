@@ -1,0 +1,79 @@
+#!/bin/bash
+
+PID_FILE="/tmp/mpv_music.pid"
+MUSIC_FAV="$HOME/.scripts/music-favorite.txt"
+
+# Pastikan direktori untuk MUSIC_FAV ada
+mkdir -p "$(dirname "$MUSIC_FAV")"
+touch "$MUSIC_FAV"
+
+# Fungsi cek apakah PID valid (mpv masih berjalan)
+is_running() {
+    [[ -f "$PID_FILE" ]] && ps -p "$(cat "$PID_FILE")" >/dev/null 2>&1
+}
+
+# Fungsi memutar musik dari URL
+play_url() {
+    local url="$1"
+
+    [[ -z "$url" ]] && notify-send "Music" "No URL provided" && return
+    is_running && notify-send "Music" "Already playing" && return
+
+    nohup mpv --no-video --really-quiet --ytdl-format=ba --loop "$url" >/dev/null 2>&1 &
+    echo $! >"$PID_FILE"
+    notify-send "Music" "Playing audio"
+}
+
+# Fungsi menghentikan musik
+stop_music() {
+    if is_running; then
+        kill "$(cat "$PID_FILE")" 2>/dev/null
+        rm -f "$PID_FILE"
+        notify-send "Music" "Stopped"
+    else
+        rm -f "$PID_FILE" # bersihkan PID invalid
+        notify-send "Music" "Nothing is playing"
+    fi
+}
+
+# Fungsi menambahkan URL ke playlist favorit
+add_to_playlist() {
+    local url
+    url=$(rofi -dmenu -theme ~/.config/rofi/input.rasi -p "Add URL to Favorite:")
+    [[ -z "$url" ]] && notify-send "Music" "Empty URL" && return
+
+    echo "$url" >>"$MUSIC_FAV"
+    notify-send "Music" "Added to favorite"
+}
+
+# Fungsi memutar playlist favorit
+play_favorite() {
+    [[ ! -s "$MUSIC_FAV" ]] && notify-send "Music" "Favorite list empty" && return
+    is_running && notify-send "Music" "Already playing" && return
+
+    nohup mpv --no-video --really-quiet --ytdl-format=ba --loop-playlist=inf --playlist="$MUSIC_FAV" >/dev/null 2>&1 &
+    echo $! >"$PID_FILE"
+    notify-send "Music" "Playing favorites"
+}
+
+# Menu Rofi
+menu() {
+    local choice
+    choice=$(
+        printf "Play URL\nStop Music\nPlay Favorite\nAdd to Playlist" |
+            rofi -dmenu -p "Music Manager" -theme ~/.config/rofi/menu.rasi
+    )
+
+    case "$choice" in
+    "Play URL")
+        local url
+        url=$(rofi -dmenu -theme ~/.config/rofi/input.rasi -p "Enter URL:")
+        play_url "$url"
+        ;;
+    "Stop Music") stop_music ;;
+    "Play Favorite") play_favorite ;;
+    "Add to Playlist") add_to_playlist ;;
+    esac
+}
+
+menu
