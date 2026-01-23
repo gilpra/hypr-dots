@@ -20,3 +20,5 @@ rofi-wayland
 grim
 wl-clipboard
 cliphist
+mpv
+yt-dlp
