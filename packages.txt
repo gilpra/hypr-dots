@@ -18,3 +18,5 @@ zoxide
 starship
 rofi-wayland
 grim
+wl-clipboard
+cliphist
