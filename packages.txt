@@ -22,3 +22,6 @@ wl-clipboard
 cliphist
 mpv
 yt-dlp
+bluez
+bluez-utils
+blueman
