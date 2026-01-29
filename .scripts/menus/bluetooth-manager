@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# VARIABLE
+ON_COLOR="#9ece6a"
+OFF_COLOR="#f7768e"
+SERVICE_OFF_COLOR="#545c7e"
+
+ICON_ON="󰂯"
+ICON_OFF="󰂲"
+ICON_MGR="󰂱"
+ICON_SVC="󰂰"
+
+# Fungsi untuk memberikan status ke waybar
+get_status() {
+    if ! systemctl -q is-active bluetooth.service; then
+        echo "<span color=\"$SERVICE_OFF_COLOR\">$ICON_OFF</span>"
+        return
+    fi
+
+    bt_powered=$(bluetoothctl show | grep -Po '(?<=Powered: )\w+' 2>/dev/null)
+    if [[ "$bt_powered" == "yes" ]]; then
+        echo "<span color=\"$ON_COLOR\">$ICON_ON</span>"
+    else
+        echo "<span color=\"$OFF_COLOR\">$ICON_OFF</span>"
+    fi
+}
