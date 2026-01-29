@@ -24,3 +24,24 @@ get_status() {
         echo "<span color=\"$OFF_COLOR\">$ICON_OFF</span>"
     fi
 }
+
+main_menu() {
+    if systemctl -q is-active bluetooth.service; then
+
+        powered=$(bluetoothctl show | grep -Po '(?<=Powered: )\w+' 2>/dev/null)
+        if [[ "$powered" == "yes" ]]; then
+            toggle="$ICON_OFF Disable Bluetooth"
+            cmd="power off"
+        else
+            toggle="$ICON_ON Enable Bluetooth"
+            cmd="power on"
+       fi
+
+    else
+        choice=$(echo "$ICON_SVC Enable Service" \
+            | rofi -dmenu -p "Bluetooth:" -theme ~/.config/rofi/menu.rasi)
+
+        [[ "$choice" ]] && pkexec systemctl start bluetooth.service \
+            && notify-send "Bluetooth" "Service enabled"
+    fi
+}
