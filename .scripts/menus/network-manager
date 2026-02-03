@@ -75,3 +75,38 @@ forget_wifi() {
     notify-send "Wi-Fi" "Forgot $ssid"
 }
 
+# Menu rofi
+menu() {
+    wifi_state=$(nmcli -t -f WIFI g)
+    toggle="Enable Service"
+    command="on"
+
+    [[ "$wifi_state" == "enabled" ]] && toggle="Disable Service" && command="off"
+
+    choice=$(printf "$toggle\nConnect\nDisconnect\nForget" |
+        rofi -dmenu -p "Network:" -theme ~/.config/rofi/menu.rasi)
+
+    case "$choice" in
+    "Enable Wi-Fi" | "Disable Wi-Fi")
+        nmcli radio wifi "$command" && notify-send "Wi-Fi Status" "Wi-Fi turned $command"
+        ;;
+    "Connect")
+        nmcli device wifi rescan >/dev/null
+        ssid=$(nmcli -t -f SSID device wifi list | awk 'NF' | sort |
+            rofi -dmenu -p "SSID:" -theme ~/.config/rofi/menu.rasi)
+        [[ -z "$ssid" ]] && exit 0
+        connect_wifi "$ssid"
+        ;;
+    "Disconnect")
+        disconnect_wifi
+        ;;
+    "Forget")
+        forget_wifi
+        ;;
+    esac
+}
+
+case "$1" in
+--status) get_status ;;
+*) menu ;;
+esac
