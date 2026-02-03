@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# VARIABLE
+ON_COLOR="#9ece6a"
+OFF_COLOR="#f7768e"
+SERVICE_OFF_COLOR="#545c7e"
+ICON_OFF="󰖪"
+ICON_ON="󱚼"
+
+# Icon sinyal 0–3
+SIGNAL_ICONS=("󰤟" "󰤢" "󰤥" "󰤨")
+SECURE_ICONS=("󰤡" "󰤤" "󰤧" "󰤪")
+
+# Fungsi untuk menampilkan status ke waybar
+get_status() {
+    wifi_state=$(nmcli -t -f WIFI g)
+    [[ "$wifi_state" != "enabled" ]] && {
+        echo "<span color=\"$SERVICE_OFF_COLOR\">$ICON_OFF</span>"
+        return
+    }
+
+    info=$(nmcli -t -f IN-USE,SIGNAL,SECURITY device wifi | grep '^*')
+    [[ -z "$info" ]] && {
+        echo "<span color=\"$OFF_COLOR\">$ICON_ON</span>"
+        return
+    }
+
+    IFS=: read -r in_use signal security <<<"$info"
+
+    level=$((signal / 25))
+    ((level > 3)) && level=3
+
+    if [[ "$security" =~ WPA|WEP ]]; then
+        echo "<span color=\"$ON_COLOR\">${SECURE_ICONS[$level]}</span>"
+    else
+        echo "<span color=\"$ON_COLOR\">${SIGNAL_ICONS[$level]}</span>"
+    fi
+}
+
