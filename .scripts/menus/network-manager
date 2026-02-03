@@ -37,3 +37,41 @@ get_status() {
     fi
 }
 
+# Fungsi untuk menyambungkan ke wifi
+connect_wifi() {
+    ssid="$1"
+
+    if nmcli connection show | grep -q "^$ssid"; then
+        nmcli connection up "$ssid" && notify-send "Wi-Fi" "Connected to $ssid"
+        return
+    fi
+
+    while true; do
+        pass=$(rofi -dmenu -password -p "Password for $ssid:" -theme ~/.config/rofi/input.rasi)
+        [[ -z "$pass" ]] && notify-send "Wi-Fi" "Cancelled" && exit 0
+
+        if nmcli device wifi connect "$ssid" password "$pass"; then
+            notify-send "Wi-Fi" "Connected to $ssid"
+            break
+        else
+            notify-send "Wi-Fi" "Wrong password, try again"
+            nmcli connection delete "$ssid" 2>/dev/null
+        fi
+    done
+}
+
+# Fungsi untuk memutus koneksi wifi
+disconnect_wifi() {
+    current=$(nmcli -t -f IN-USE,SSID device wifi | grep '^*' | cut -d: -f2)
+    [[ -n "$current" ]] && nmcli connection down "$current" && notify-send "Wi-Fi" "Disconnected"
+}
+
+# Fungsi untuk menghapus wifi
+forget_wifi() {
+    ssid=$(nmcli -t -f NAME connection show | sort | rofi -dmenu -p "Forget SSID:" -theme ~/.config/rofi/menu.rasi)
+    [[ -z "$ssid" ]] && exit 0
+
+    nmcli connection delete "$ssid"
+    notify-send "Wi-Fi" "Forgot $ssid"
+}
+
