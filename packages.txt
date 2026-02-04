@@ -25,3 +25,6 @@ yt-dlp
 bluez
 bluez-utils
 blueman
+waybar
+brightnessctl
+pavucontrol
