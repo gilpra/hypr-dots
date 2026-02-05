@@ -28,3 +28,4 @@ blueman
 waybar
 brightnessctl
 pavucontrol
+dunst
