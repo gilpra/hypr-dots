@@ -29,3 +29,4 @@ waybar
 brightnessctl
 pavucontrol
 dunst
+hyprpicker
