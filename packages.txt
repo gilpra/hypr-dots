@@ -30,3 +30,4 @@ brightnessctl
 pavucontrol
 dunst
 hyprpicker
+stow
