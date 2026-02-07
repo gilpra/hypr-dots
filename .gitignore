@@ -1,0 +1,16 @@
+# Certificates, Keys, and Environment
+**/*.key
+**/*.pem
+**/*.crt
+**/*.env
+
+# Cache, Logs, and Swap Files
+**/.cache/
+**/*.swp
+
+# Backup and Temporary Files
+**/*.bak
+**/*~
+
+# Xfce4 Desktop Environment Config
+**/help.rc
