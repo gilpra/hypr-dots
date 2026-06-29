@@ -1,0 +1,11 @@
+hyprland
+polkit-gnome
+thunar
+gvfs
+thunar-archive-plugin
+xarchiver
+tumbler
+ttf-0xproto-nerd
+xdg-desktop-portal
+xdg-desktop-portal-hyprland
+xdg-user-dirs
