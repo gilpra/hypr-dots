@@ -5,6 +5,13 @@ if status is-login
     end
 end
 
+# Menampilkan Fastfetch jika terminal adalah foot
+function fish_greeting
+    if test "$TERM" = alacritty
+        fastfetch -c ~/.config/fastfetch/presets/simple.jsonc
+    end
+end
+
 ###########
 ## ALIAS ##
 ###########
