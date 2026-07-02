@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# VARIABLE
+ON_COLOR="#9ece6a"
+OFF_COLOR="#f7768e"
+SERVICE_OFF_COLOR="#545c7e"
+ICON_OFF="󰖪"
+ICON_ON="󱚼"
+
+# Icon sinyal 0–3
+SIGNAL_ICONS=("󰤟" "󰤢" "󰤥" "󰤨")
+SECURE_ICONS=("󰤡" "󰤤" "󰤧" "󰤪")
+
+# Fungsi untuk menampilkan status ke waybar
+get_status() {
+    wifi_state=$(nmcli -t -f WIFI g)
+    [[ "$wifi_state" != "enabled" ]] && {
+        echo "<span color=\"$SERVICE_OFF_COLOR\">$ICON_OFF</span>"
+        return
+    }
+
+    info=$(nmcli -t -f IN-USE,SIGNAL,SECURITY device wifi | grep '^*')
+    [[ -z "$info" ]] && {
+        echo "<span color=\"$OFF_COLOR\">$ICON_ON</span>"
+        return
+    }
+
+    IFS=: read -r in_use signal security <<<"$info"
+
+    level=$((signal / 25))
+    ((level > 3)) && level=3
+
+    if [[ "$security" =~ WPA|WEP ]]; then
+        echo "<span color=\"$ON_COLOR\">${SECURE_ICONS[$level]}</span>"
+    else
+        echo "<span color=\"$ON_COLOR\">${SIGNAL_ICONS[$level]}</span>"
+    fi
+}
+
+# Fungsi untuk menyambungkan ke wifi
+connect_wifi() {
+    ssid="$1"
+
+    if nmcli connection show | grep -q "^$ssid"; then
+        nmcli connection up "$ssid" && notify-send "Wi-Fi" "Connected to $ssid"
+        return
+    fi
+
+    while true; do
+        pass=$(rofi -dmenu -password -p "Password for $ssid:" -theme ~/.config/rofi/input.rasi)
+        [[ -z "$pass" ]] && notify-send "Wi-Fi" "Cancelled" && exit 0
+
+        if nmcli device wifi connect "$ssid" password "$pass"; then
+            notify-send "Wi-Fi" "Connected to $ssid"
+            break
+        else
+            notify-send "Wi-Fi" "Wrong password, try again"
+            nmcli connection delete "$ssid" 2>/dev/null
+        fi
+    done
+}
+
+# Fungsi untuk memutus koneksi wifi
+disconnect_wifi() {
+    current=$(nmcli -t -f IN-USE,SSID device wifi | grep '^*' | cut -d: -f2)
+    [[ -n "$current" ]] && nmcli connection down "$current" && notify-send "Wi-Fi" "Disconnected"
+}
+
+# Fungsi untuk menghapus wifi
+forget_wifi() {
+    ssid=$(nmcli -t -f NAME connection show | sort | rofi -dmenu -p "Forget SSID:" -theme ~/.config/rofi/menu.rasi)
+    [[ -z "$ssid" ]] && exit 0
+
+    nmcli connection delete "$ssid"
+    notify-send "Wi-Fi" "Forgot $ssid"
+}
+
+# Menu rofi
+menu() {
+    wifi_state=$(nmcli -t -f WIFI g)
+    toggle="Enable Service"
+    command="on"
+
+    [[ "$wifi_state" == "enabled" ]] && toggle="Disable Service" && command="off"
+
+    choice=$(printf "$toggle\nConnect\nDisconnect\nForget" |
+        rofi -dmenu -p "Network:" -theme ~/.config/rofi/menu.rasi)
+
+    case "$choice" in
+    "Enable Wi-Fi" | "Disable Wi-Fi")
+        nmcli radio wifi "$command" && notify-send "Wi-Fi Status" "Wi-Fi turned $command"
+        ;;
+    "Connect")
+        nmcli device wifi rescan >/dev/null
+        ssid=$(nmcli -t -f SSID device wifi list | awk 'NF' | sort |
+            rofi -dmenu -p "SSID:" -theme ~/.config/rofi/menu.rasi)
+        [[ -z "$ssid" ]] && exit 0
+        connect_wifi "$ssid"
+        ;;
+    "Disconnect")
+        disconnect_wifi
+        ;;
+    "Forget")
+        forget_wifi
+        ;;
+    esac
+}
+
+case "$1" in
+--status) get_status ;;
+*) menu ;;
+esac
