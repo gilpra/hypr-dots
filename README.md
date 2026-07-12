@@ -4,7 +4,7 @@
 
 ## 📸 Preview
 
-![desktop](https://github.com/garpra/assets-repo/blob/main/dotfiles/hyprland.png?raw=true)
+![desktop](https://raw.githubusercontent.com/garpra/assets-repo/main/screenshots/hyprland/1.png)
 
 ## 🔧 Stack
 
