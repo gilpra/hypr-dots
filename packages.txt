@@ -31,3 +31,4 @@ pavucontrol
 dunst
 hyprpicker
 micro
+stow
