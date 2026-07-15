@@ -106,7 +106,8 @@ fi
 # Create symlinks with stow
 log "Creating symlinks using stow..."
 mkdir -p \
-  "$HOME/.local/share/themes"
+  "$HOME/.local/share/themes" \
+  "$HOME/.local/share/icons"
 
 cd "$DOTFILES_DIR"
 stow -R --target="$HOME" sway-dots
@@ -117,6 +118,35 @@ if [[ ! -d "$HOME/.local/share/themes/Tokyonight-Dark" ]]; then
   git clone https://github.com/garpra/tokyodark-gtk \
     "$HOME/.local/share/themes/Tokyonight-Dark"
   ok "Tokyonight-Dark theme installed"
+fi
+
+# Install Tela-circle icon theme
+if [[ ! -d "$HOME/.local/share/icons/Tela-circle" ]]; then
+  log "Installing Tela-circle icon theme..."
+  tela_tmp="$(mktemp -d)"
+  trap 'rm -rf "$tela_tmp"' EXIT
+
+  git clone https://github.com/vinceliuice/Tela-circle-icon-theme "$tela_tmp/tela-circle"
+  bash "$tela_tmp/tela-circle/install.sh"
+
+  trap - EXIT
+  rm -rf "$tela_tmp"
+  ok "Tela-circle icon theme installed"
+fi
+
+# Install Bibata-Modern-Ice cursor
+if [[ ! -d "$HOME/.local/share/icons/Bibata-Modern-Ice" ]]; then
+  log "Downloading Bibata-Modern-Ice cursor..."
+  bibata_url="https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz"
+  bibata_tmp="$(mktemp -d)"
+  trap 'rm -rf "$bibata_tmp"' EXIT
+
+  curl -L --fail --output "$bibata_tmp/bibata.tar.xz" "$bibata_url"
+  tar -xJf "$bibata_tmp/bibata.tar.xz" -C "$HOME/.local/share/icons"
+
+  trap - EXIT
+  rm -rf "$bibata_tmp"
+  ok "Bibata-Modern-Ice cursor installed"
 fi
 
 ok "Setup completed!"
