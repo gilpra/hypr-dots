@@ -2,11 +2,11 @@
 
 > Clean & minimal Hyprland setup with Arch Linux.
 
-## 📸 Preview
+## Preview
 
-![desktop](https://raw.githubusercontent.com/garpra/assets-repo/main/screenshots/hyprland/1.png)
+![desktop](https://raw.githubusercontent.com/gilpra/assets-repo/main/screenshots/hyprland/1.png)
 
-## 🔧 Stack
+## Stack
 
 - **OS:** Arch Linux
 - **WM:** Hyprland
@@ -14,12 +14,12 @@
 - **Terminal:** Alacritty
 - **Shell:** Fish
 
-## ⚡ Installation
+## Installation
 
 Clone this repo to `$HOME`:
 
 ```bash
-git clone https://github.com/garpra/dots-hypr ~/.dotfiles/dots-hypr
+git clone https://github.com/gilpra/dots-hypr ~/.dotfiles/dots-hypr
 
 cd ~/.dotfiles/dots-hypr
 ```
